@@ -14,7 +14,7 @@
 // 
 // 
 #define     DEBUG1                  // First level of Debug
-//#define     DEBUG2                  // Second level of Debug
+#define     DEBUG2                  // Second level of Debug
 //#define     DEBUG3                  // Third level of Debug
 
 #define       RDY 2
@@ -48,10 +48,10 @@ char  ssid[64]          = "ssid";       // TODO: Update this with your WIFI SSID
 char  password[64]      = "password";   // TODO: Update this with your WIFI Password
 
 // TODO: add more of these depending on your specifications
-char  clk_mode[4]       = "";
-char  hour[4]           = "";
-char  minute[4]         = "";
-char  second[4]         = "";
+char  clk_mode[5]       = "";
+char  hour[5]           = "";
+char  minute[5]         = "";
+char  second[5]         = "";
 
 char  cmd[20];          
 #define SER_BUF_LEN 256                              
@@ -63,7 +63,7 @@ char  ser_buf[SER_BUF_LEN];
 //
 const char *mqtt_username       = "";     // Not needed for this appication 
 const char *mqtt_password       = "";
-char        mqtt_broker[20]     = "broker.emqx.io";     // TODO: Replace if required
+char        mqtt_broker[20]     = "10.159.177.60";     // TODO: Replace if required
 char        port[5]             = "1883";               // TODO: Replace if required
 int         mqtt_port;
 
@@ -245,7 +245,11 @@ void setup() {
       client_id += eid;
       
       #ifdef DEBUG1
-        Serial.print("The client is connecting to the mqtt broker using client ID:  "); 
+        Serial.print("The client is connecting to the mqtt broker at ");
+        Seiral.print(mqtt_broker);
+        Serial.print(":");
+        Seiral.print(mqtt_port);
+        Serial.print(" using client ID:  "); 
         Serial.println(client_id.c_str());
         Serial.flush();
       #endif
@@ -326,13 +330,14 @@ void callback(char *topic_subscribe, byte *payload, unsigned int length) {
   }
 }
 
+
 // ------------------------------------------------------------------------
 //  This routine sends Lab 4E data to the Web page
 //
 void tm4c2mqtt(void) {
   
   static int bufpos = 0;              // starts the buffer back at the first position in the incoming serial.read
-
+  
   while (Serial.available() > 0)      // Wait for date from the TM4C
   {
     char inchar = Serial.read();      // Assigns one byte (as serial.read()'s only input one byte at a time
@@ -340,18 +345,16 @@ void tm4c2mqtt(void) {
     if (inchar != '\n') {             // if the incoming character is not a newline then process byte the buffer position
       ser_buf[bufpos] = inchar;       // in the array get assigned to the current read once that has happend the buffer advances,
       bufpos++;                       //  doing this over and over again until the end of package marker is read.
-      delay(10);
-    }
-    else if (inchar == '\n')
-    {
-       if (bufpos  > 0) 
-       {
+
+    } else if (inchar == '\n') {
+       if (bufpos  > 0) {
 
         char pf = 0; //Parse Failed
         pf |= get_next_token(clk_mode, ser_buf, ",");
         pf |= get_next_token(hour,     NULL,    ",");
         pf |= get_next_token(minute,   NULL,    ",");
         pf |= get_next_token(second,   NULL,    ",");
+
         #ifdef DEBUG2
           if(pf)
             Serial.print("\nFailed to parse one or more input strings!\n");

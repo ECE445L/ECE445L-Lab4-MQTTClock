@@ -246,9 +246,9 @@ void setup() {
       
       #ifdef DEBUG1
         Serial.print("The client is connecting to the mqtt broker at ");
-        Seiral.print(mqtt_broker);
+        Serial.print(mqtt_broker);
         Serial.print(":");
-        Seiral.print(mqtt_port);
+        Serial.print(mqtt_port);
         Serial.print(" using client ID:  "); 
         Serial.println(client_id.c_str());
         Serial.flush();
